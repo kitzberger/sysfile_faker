@@ -1,0 +1,5 @@
+# cat=basic/enable/1; type=boolean; label=Enable:Check this to enable image faking of missing sys_file resources.
+enable =
+
+# cat=basic/enable/2; type=string; label=Font file:specify path to ttf file used for rendering the text onto the images
+fontFile =
