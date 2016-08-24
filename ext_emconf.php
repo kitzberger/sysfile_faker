@@ -4,7 +4,7 @@ $EM_CONF[$_EXTKEY] = array(
     'description' => 'Creates dummy image files for sys_file records whose files went missing',
     'category' => 'misc',
     'shy' => 0,
-    'version' => '1.0.0',
+    'version' => '1.0.1',
     'dependencies' => 'cms',
     'conflicts' => '',
     'priority' => '',
@@ -23,7 +23,7 @@ $EM_CONF[$_EXTKEY] = array(
     'CGLcompliance_note' => '',
     'constraints' => array(
         'depends' => array(
-            'typo3' => '7.6.*-',
+            'typo3' => '7.6.*-7.99.*',
         ),
         'conflicts' => array(
         ),
