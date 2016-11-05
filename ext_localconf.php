@@ -12,5 +12,5 @@ if ($_EXTCONF['fontFile']) {
 }
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Resource\\FileReference'] = array(
- 'className' => 'Kitzberger\\SysfileFaker\\FileReference'
+	'className' => 'Kitzberger\\SysfileFaker\\FileReference'
 );
