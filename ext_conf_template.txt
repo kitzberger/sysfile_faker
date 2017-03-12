@@ -1,5 +1,11 @@
-# cat=basic/enable/1; type=boolean; label=Enable:Check this to enable image faking of missing sys_file resources.
+# cat=basic/enable/1; type=boolean; label=File faking?:Check this to enable image faking of missing sys_file resources.
 enable =
 
-# cat=basic/enable/2; type=string; label=Font file:specify path to ttf file used for rendering the text onto the images
+# cat=basic/enable/2; type=string; label=Font file:Specify path to ttf file used for rendering the text onto the faked images
 fontFile =
+
+# cat=basic/enable/3; type=string; label=Remote host:Specify remote host to load files from, e.g. "https://www.domain.org"
+remoteHost =
+
+# cat=basic/enable/4; type=string; label=Remote host basic auth:Specify basic auth for remote host, e.g. "username:password"
+remoteHostBasicAuth =
