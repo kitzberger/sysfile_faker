@@ -5,6 +5,16 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 {
 	/**
+	 * @var string
+	 */
+	private $publicUrl;
+
+	/**
+	 * @var  boolean
+	 */
+	private $isRemoteVideoPlaceholder = false;
+
+	/**
 	 * Constructor for a file in use object. Should normally not be used
 	 * directly, use the corresponding factory methods instead.
 	 *
@@ -18,12 +28,14 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 	{
 		parent::__construct($fileReferenceData, $factory);
 
-		if (empty($this->getPublicUrl())) {
+		$this->determinePublicUrl();
+
+		if (empty($this->publicUrl)) {
 			// \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to empty publicUrl. Folder missing?');
 			return;
 		}
 
-		$file = PATH_site . $this->getPublicUrl();
+		$file = PATH_site . $this->publicUrl;
 
 		if (!file_exists($file)) {
 			if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) &&
@@ -40,10 +52,25 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		}
 	}
 
+	public function determinePublicUrl()
+	{
+		$fileExtension = $this->getExtension();
+
+		$this->isRemoteVideoPlaceholder = in_array($this->getExtension(), ['youtube', 'vimeo']);
+
+		if ($this->isRemoteVideoPlaceholder) {
+			// .youtube and .video
+			$this->publicUrl = $this->getStorage()->getPublicUrl($this);
+		} else {
+			// .pdf, .jpg, .png, etc.
+			$this->publicUrl = $this->getPublicUrl();
+		}
+	}
+
 	private function ensureFolderExists()
 	{
 		// create folder if necessary
-		$folder = dirname(PATH_site . $this->getPublicUrl());
+		$folder = dirname(PATH_site . $this->publicUrl);
 		if (!is_dir($folder)) {
 			mkdir($folder, 0777, true);
 		}
@@ -57,14 +84,14 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		$host = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']['remoteHost'];
 		$credentials = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']['remoteHostBasicAuth'];
 
-		$remoteFile = rtrim($host, '/') . '/' . $this->getPublicUrl();
+		$remoteFile = rtrim($host, '/') . '/' . $this->publicUrl;
 
 		$headers = ["Authorization: Basic " . base64_encode($credentials)];
 
 		$report = [];
 		$content = GeneralUtility::getUrl($remoteFile.'2', 0, $headers, $report);
 		if ($content) {
-			$localFile = PATH_site . $this->getPublicUrl();
+			$localFile = PATH_site . $this->publicUrl;
 			GeneralUtility::writeFile($localFile, $content);
 		}
 	}
@@ -74,10 +101,15 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		// create folder if necessary
 		$this->ensureFolderExists();
 
-		$file = PATH_site . $this->getPublicUrl();
+		$file = PATH_site . $this->publicUrl;
 
-		//var_dump('Faking: ' . PATH_site . $this->getPublicUrl());
+		//var_dump('Faking: ' . PATH_site . $this->publicUrl);
 		//var_dump($this->getProperties());
+
+		if ($this->isRemoteVideoPlaceholder) {
+			GeneralUtility::writeFile($file, 'DLzxrzFCyOs');
+			return;
+		}
 
 		$props = $this->getProperties();
 
