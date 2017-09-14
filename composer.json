@@ -1,5 +1,5 @@
 {
-	"name": "Kitzberger/sysfile-faker",
+	"name": "kitzberger/sysfile-faker",
 	"type": "typo3-cms-extension",
 	"description": "Creates dummy image files for sys_file records whose files went missing",
 	"homepage": "https://github.com/Kitzberger/sysfile_faker",
