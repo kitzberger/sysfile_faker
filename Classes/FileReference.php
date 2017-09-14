@@ -86,7 +86,11 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 
 		$remoteFile = rtrim($host, '/') . '/' . $this->publicUrl;
 
-		$headers = ["Authorization: Basic " . base64_encode($credentials)];
+		$headers = [];
+
+		if ($credentials) {
+			$headers[] = 'Authorization: Basic ' . base64_encode($credentials);
+		}
 
 		$report = [];
 		$content = GeneralUtility::getUrl($remoteFile, 0, $headers, $report);
