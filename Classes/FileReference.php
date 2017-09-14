@@ -89,7 +89,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		$headers = ["Authorization: Basic " . base64_encode($credentials)];
 
 		$report = [];
-		$content = GeneralUtility::getUrl($remoteFile.'2', 0, $headers, $report);
+		$content = GeneralUtility::getUrl($remoteFile, 0, $headers, $report);
 		if ($content) {
 			$localFile = PATH_site . $this->publicUrl;
 			GeneralUtility::writeFile($localFile, $content);
