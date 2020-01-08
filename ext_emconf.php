@@ -4,7 +4,7 @@ $EM_CONF[$_EXTKEY] = array(
     'description' => 'Creates dummy image files for sys_file records whose files went missing',
     'category' => 'misc',
     'shy' => 0,
-    'version' => '1.1.0',
+    'version' => '1.4.0',
     'dependencies' => 'cms',
     'conflicts' => '',
     'priority' => '',
@@ -17,13 +17,13 @@ $EM_CONF[$_EXTKEY] = array(
     'clearcacheonload' => 1,
     'lockType' => '',
     'author' => 'Philipp Kitzberger',
-    'author_email' => 'philipp@kitze.net',
+    'author_email' => 'typo3@kitze.net',
     'author_company' => '',
     'CGLcompliance' => '',
     'CGLcompliance_note' => '',
     'constraints' => array(
         'depends' => array(
-            'typo3' => '7.6.*-',
+            'typo3' => '8.7.0-9.5.99',
         ),
         'conflicts' => array(
         ),

@@ -1,6 +1,7 @@
 <?php
 namespace Kitzberger\SysfileFaker;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Core\Environment;
 
 class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 {
@@ -29,13 +30,12 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		parent::__construct($fileReferenceData, $factory);
 
 		$this->determinePublicUrl();
-
 		if (empty($this->publicUrl)) {
 			// \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to empty publicUrl. Folder missing?');
 			return;
 		}
 
-		$file = PATH_site . $this->publicUrl;
+		$file = Environment::getPublicPath() . '/' . $this->publicUrl;
 
 		if (!file_exists($file)) {
 			if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) &&
@@ -70,7 +70,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 	private function ensureFolderExists()
 	{
 		// create folder if necessary
-		$folder = dirname(PATH_site . $this->publicUrl);
+		$folder = dirname(Environment::getPublicPath() . '/' . $this->publicUrl);
 		if (!is_dir($folder)) {
 			mkdir($folder, 0777, true);
 		}
@@ -95,7 +95,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		$report = [];
 		$content = GeneralUtility::getUrl($remoteFile, 0, $headers, $report);
 		if ($content) {
-			$localFile = PATH_site . $this->publicUrl;
+			$localFile = Environment::getPublicPath() . '/' . $this->publicUrl;
 			GeneralUtility::writeFile($localFile, $content);
 		}
 	}
@@ -105,9 +105,9 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		// create folder if necessary
 		$this->ensureFolderExists();
 
-		$file = PATH_site . $this->publicUrl;
+		$file = Environment::getPublicPath() . '/' . $this->publicUrl;
 
-		//var_dump('Faking: ' . PATH_site . $this->publicUrl);
+		//var_dump('Faking: ' . Environment::getPublicPath() . '/' . $this->publicUrl);
 		//var_dump($this->getProperties());
 
 		if ($this->isRemoteVideoPlaceholder) {
