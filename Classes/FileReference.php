@@ -54,8 +54,6 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 
 	public function determinePublicUrl()
 	{
-		$fileExtension = $this->getExtension();
-
 		$this->isRemoteVideoPlaceholder = in_array($this->getExtension(), ['youtube', 'vimeo']);
 
 		if ($this->isRemoteVideoPlaceholder) {
