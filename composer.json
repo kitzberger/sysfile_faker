@@ -2,21 +2,31 @@
   "name": "kitzberger/sysfile-faker",
   "type": "typo3-cms-extension",
   "description": "Creates dummy image files for sys_file records whose files went missing",
+  "keywords": [
+    "TYPO3 CMS"
+  ],
   "homepage": "https://github.com/kitzberger/sysfile_faker",
-  "license": ["GPL-2.0-or-later"],
-  "keywords": ["TYPO3 CMS"],
+  "license": [
+    "GPL-2.0-or-later"
+  ],
   "require": {
     "typo3/cms-core": "^8.7 || ^9.5"
+  },
+  "require-dev": {
+    "ergebnis/composer-normalize": "^2.14"
+  },
+  "extra": {
+    "composer-normalize": {
+      "indent-size": 2,
+      "indent-style": "space"
+    },
+    "typo3/cms": {
+      "extension-key": "sysfile_faker"
+    }
   },
   "autoload": {
     "psr-4": {
       "Kitzberger\\SysfileFaker\\": "Classes/"
     }
-  },
-  "extra": {
-    "typo3/cms": {
-      "extension-key": "sysfile_faker"
-    }
   }
 }
-
