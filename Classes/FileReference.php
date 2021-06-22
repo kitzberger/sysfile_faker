@@ -115,7 +115,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 
 		$props = $this->getProperties();
 
-		if ((int)$props['width'] * (int)$props['height'] === 0) {
+		if ((int)$props['width'] * (int)$props['height'] === 0 && $props['extension'] !== 'pdf') {
 			// \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to image having no width or height.');
 			return;
 		}
