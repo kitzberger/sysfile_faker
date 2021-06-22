@@ -108,14 +108,53 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 		//var_dump('Faking: ' . Environment::getPublicPath() . '/' . $this->publicUrl);
 		//var_dump($this->getProperties());
 
-		if ($this->isRemoteVideoPlaceholder) {
-			GeneralUtility::writeFile($file, 'DLzxrzFCyOs');
-			return;
+		switch ($this->getExtension()) {
+			case 'youtube':
+				$this->createFakeYoutubeFile($file);
+				break;
+			case 'vimeo':
+				$this->createFakeVimeoFile($file);
+				break;
+			case 'pdf':
+				$this->createFakePdfFile($file);
+				break;
+			case 'txt':
+				$this->createFakeTxtFile($file);
+				break;
+			default:
+				$this->createFakeImageFile($file);
+				break;
 		}
+	}
 
+	protected function createFakeYoutubeFile($file, $content = 'DLzxrzFCyOs')
+	{
+		GeneralUtility::writeFile($file, $content);
+	}
+
+	protected function createFakeVimeoFile($file, $content = '148751763')
+	{
+		GeneralUtility::writeFile($file, $content);
+	}
+
+	protected function createFakeTxtFile($file, $content = 'This is a dummy TXT file.')
+	{
+		GeneralUtility::writeFile($file, $content);
+	}
+
+	protected function createFakePdfFile($file, $dummy = 'EXT:sysfile_faker/Resources/Private/Dummy/dummy.pdf')
+	{
+		$dummy = GeneralUtility::getFileAbsFileName($dummy);
+		$dummy = GeneralUtility::fixWindowsFilePath($dummy);
+
+		GeneralUtility::upload_copy_move($dummy, $file);
+	}
+
+	protected function createFakeImageFile($file)
+	{
 		$props = $this->getProperties();
 
-		if ((int)$props['width'] * (int)$props['height'] === 0 && $props['extension'] !== 'pdf') {
+		if ((int)$props['width'] * (int)$props['height'] === 0) {
 			// \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to image having no width or height.');
 			return;
 		}
