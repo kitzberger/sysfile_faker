@@ -37,18 +37,18 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 
 		$file = Environment::getPublicPath() . '/' . $this->publicUrl;
 
-		if (!file_exists($file)) {
-			if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) &&
-				$GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) {
-				$this->loadFileFromRemote();
-			}
+		if (file_exists($file)) {
+			return;
 		}
 
-		if (!file_exists($file)) {
-			if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['fakeFilesIfMissing']) &&
-				$GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['fakeFilesIfMissing']) {
-				$this->createFakeFile();
-			}
+		if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) &&
+			$GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) {
+			$this->loadFileFromRemote();
+		}
+
+		if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['fakeFilesIfMissing']) &&
+			$GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['fakeFilesIfMissing']) {
+			$this->createFakeFile();
 		}
 	}
 
