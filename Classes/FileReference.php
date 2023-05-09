@@ -10,7 +10,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
     /**
      * @var string
      */
-    private $publicUrl;
+    private $relativePublicUrl;
 
     /**
      * @var  boolean
@@ -31,13 +31,13 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
     {
         parent::__construct($fileReferenceData, $factory);
 
-        $this->determinePublicUrl();
-        if (empty($this->publicUrl)) {
-            // \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to empty publicUrl. Folder missing?');
+        $this->determineRelativeUrl();
+        if (empty($this->relativePublicUrl)) {
+            // \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to empty relativePublicUrl. Folder missing?');
             return;
         }
 
-        $file = Environment::getPublicPath() . '/' . $this->publicUrl;
+        $file = Environment::getPublicPath() . '/' . $this->relativePublicUrl;
 
         if (!file_exists($file)) {
             if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) &&
@@ -54,23 +54,28 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         }
     }
 
-    public function determinePublicUrl()
+    public function determineRelativeUrl()
     {
         $this->isRemoteVideoPlaceholder = in_array($this->getExtension(), ['youtube', 'vimeo']);
 
         if ($this->isRemoteVideoPlaceholder) {
             // .youtube and .video
-            $this->publicUrl = $this->getStorage()->getPublicUrl($this);
+            $this->relativePublicUrl = $this->getStorage()->getPublicUrl($this);
         } else {
             // .pdf, .jpg, .png, etc.
-            $this->publicUrl = $this->getPublicUrl();
+            $this->relativePublicUrl = $this->getPublicUrl();
+        }
+
+        // EXT:headless compatibility
+        if ($parts = parse_url($this->relativePublicUrl)) {
+            $this->relativePublicUrl = $parts['path'];
         }
     }
 
     private function ensureFolderExists()
     {
         // create folder if necessary
-        $folder = dirname(Environment::getPublicPath() . '/' . $this->publicUrl);
+        $folder = dirname(Environment::getPublicPath() . '/' . $this->relativePublicUrl);
         if (!is_dir($folder)) {
             mkdir($folder, 0777, true);
         }
@@ -84,7 +89,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         $host = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']['remoteHost'];
         $credentials = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']['remoteHostBasicAuth'];
 
-        $remoteFile = rtrim($host, '/') . '/' . $this->publicUrl;
+        $remoteFile = rtrim($host, '/') . '/' . $this->relativePublicUrl;
 
         $headers = [];
 
@@ -95,7 +100,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         $report = [];
         $content = GeneralUtility::getUrl($remoteFile, 0, $headers, $report);
         if ($content) {
-            $localFile = Environment::getPublicPath() . '/' . $this->publicUrl;
+            $localFile = Environment::getPublicPath() . '/' . $this->relativePublicUrl;
             GeneralUtility::writeFile($localFile, $content);
         }
     }
@@ -105,9 +110,9 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         // create folder if necessary
         $this->ensureFolderExists();
 
-        $file = Environment::getPublicPath() . '/' . $this->publicUrl;
+        $file = Environment::getPublicPath() . '/' . $this->relativePublicUrl;
 
-        //var_dump('Faking: ' . Environment::getPublicPath() . '/' . $this->publicUrl);
+        //var_dump('Faking: ' . Environment::getPublicPath() . '/' . $this->relativePublicUrl);
         //var_dump($this->getProperties());
 
         switch ($this->getExtension()) {
