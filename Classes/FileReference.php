@@ -13,10 +13,10 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
     /**
      * @var string
      */
-    private $publicUrl;
+    private $relativePublicUrl;
 
     /**
-     * @var  bool
+     * @var  boolean
      */
     private $isRemoteVideoPlaceholder = false;
 
@@ -24,19 +24,23 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
      * Constructor for a file in use object. Should normally not be used
      * directly, use the corresponding factory methods instead.
      *
+     * @param array $fileReferenceData
      * @param ResourceFactory $factory
+     *
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $fileReferenceData, $factory = null)
     {
         parent::__construct($fileReferenceData, $factory);
 
-        $this->determinePublicUrl();
-        if (empty($this->publicUrl)) {
-            // \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to empty publicUrl. Folder missing?');
+        $this->determineRelativeUrl();
+        if (empty($this->relativePublicUrl)) {
+            // \TYPO3\CMS\Core\Utility\DebugUtility::debug('Abort sysfile_faker, due to empty relativePublicUrl. Folder missing?');
             return;
         }
 
-        $file = Environment::getPublicPath() . '/' . $this->publicUrl;
+        $file = Environment::getPublicPath() . '/' . $this->relativePublicUrl;
 
         if (!file_exists($file)) {
             if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']) &&
@@ -53,23 +57,28 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         }
     }
 
-    public function determinePublicUrl()
+    public function determineRelativeUrl()
     {
         $this->isRemoteVideoPlaceholder = in_array($this->getExtension(), ['youtube', 'vimeo']);
 
         if ($this->isRemoteVideoPlaceholder) {
             // .youtube and .video
-            $this->publicUrl = $this->getStorage()->getPublicUrl($this);
+            $this->relativePublicUrl = $this->getStorage()->getPublicUrl($this);
         } else {
             // .pdf, .jpg, .png, etc.
-            $this->publicUrl = $this->getPublicUrl();
+            $this->relativePublicUrl = $this->getPublicUrl();
+        }
+
+        // EXT:headless compatibility
+        if ($parts = parse_url($this->relativePublicUrl)) {
+            $this->relativePublicUrl = $parts['path'];
         }
     }
 
     private function ensureFolderExists()
     {
         // create folder if necessary
-        $folder = dirname(Environment::getPublicPath() . '/' . $this->publicUrl);
+        $folder = dirname(Environment::getPublicPath() . '/' . $this->relativePublicUrl);
         if (!is_dir($folder)) {
             mkdir($folder, 0777, true);
         }
@@ -83,28 +92,19 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         $host = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']['remoteHost'];
         $credentials = $GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['loadFilesFromRemoteIfMissing']['remoteHostBasicAuth'];
 
-        $remoteFile = rtrim($host, '/') . '/' . $this->publicUrl;
+        $remoteFile = rtrim($host, '/') . '/' . $this->relativePublicUrl;
 
-        $additionalOptions = [];
+        $headers = [];
+
         if ($credentials) {
-            $parts = explode(':', $credentials);
-            $additionalOptions['auth'] = [
-                $parts[0], // username
-                $parts[1], // password
-                'basic', // type
-            ];
+            $headers[] = 'Authorization: Basic ' . base64_encode($credentials);
         }
 
-        try {
-            $requestFactory = GeneralUtility::makeInstance(RequestFactory::class);
-            $response = $requestFactory->request($remoteFile, 'GET', $additionalOptions);
-            $content = $response->getBody()->getContents();
-
-            if ($content) {
-                $localFile = Environment::getPublicPath() . '/' . $this->publicUrl;
-                GeneralUtility::writeFile($localFile, $content);
-            }
-        } catch (RequestException $exception) {
+        $report = [];
+        $content = GeneralUtility::getUrl($remoteFile, 0, $headers, $report);
+        if ($content) {
+            $localFile = Environment::getPublicPath() . '/' . $this->relativePublicUrl;
+            GeneralUtility::writeFile($localFile, $content);
         }
     }
 
@@ -113,9 +113,9 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         // create folder if necessary
         $this->ensureFolderExists();
 
-        $file = Environment::getPublicPath() . '/' . $this->publicUrl;
+        $file = Environment::getPublicPath() . '/' . $this->relativePublicUrl;
 
-        //var_dump('Faking: ' . Environment::getPublicPath() . '/' . $this->publicUrl);
+        //var_dump('Faking: ' . Environment::getPublicPath() . '/' . $this->relativePublicUrl);
         //var_dump($this->getProperties());
 
         switch ($this->getExtension()) {
@@ -185,17 +185,21 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
             $fontSize = 40;
 
             $bbox = imagettfbbox($fontSize, 0, $font, $text);
-            if ($bbox) {
-                $bbox['width'] = abs($bbox[2] - $bbox[0]);
-                if ($bbox[0] < -1) {
-                    $bbox['width'] = abs($bbox[2]) + abs($bbox[0]) - 1;
-                }
-                $bbox['height'] = abs($bbox[7]) - abs($bbox[1]);
-                if ($bbox[3] > 0) {
-                    $bbox['height'] = abs($bbox[7] - $bbox[1]) - 1;
-                }
-                imagettftext($image, $fontSize, 0, ($props['width'] / 2) - ($bbox['width'] / 2), ($props['height'] / 2) + ($bbox['height'] / 2), 0, $font, $text);
+            if ($bbox[0] >= -1) {
+                $bbox['x'] = abs($bbox[0] + 1) * -1;
+            } else {
+                $bbox['x'] = abs($bbox[0] + 2);
             }
+            $bbox['y'] = abs($bbox[5] + 1);
+            $bbox['width'] = abs($bbox[2] - $bbox[0]);
+            if ($bbox[0] < -1) {
+                $bbox['width'] = abs($bbox[2]) + abs($bbox[0]) - 1;
+            }
+            $bbox['height'] = abs($bbox[7]) - abs($bbox[1]);
+            if ($bbox[3] > 0) {
+                $bbox['height'] = abs($bbox[7] - $bbox[1]) - 1;
+            }
+            imagettftext($image, $fontSize, 0, ($props['width'] / 2) - ($bbox['width'] / 2), ($props['height'] / 2) + ($bbox['height'] / 2), 0, $font, $text);
         } else {
             imagestring($image, 5, 50, 50, $text, $black);
         }

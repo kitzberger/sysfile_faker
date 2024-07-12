@@ -1,9 +1,11 @@
 <?php
-$EM_CONF['sysfile_faker'] = [
+
+$EM_CONF[$_EXTKEY] = [
     'title' => 'Faking missing sys_file images',
     'description' => 'Creates dummy image files for sys_file records whose files went missing',
     'category' => 'misc',
-    'version' => '1.6.0',
+    'shy' => 0,
+    'version' => '1.7.0',
     'dependencies' => 'cms',
     'state' => 'stable',
     'clearcacheonload' => 1,
