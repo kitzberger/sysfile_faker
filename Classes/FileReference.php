@@ -2,6 +2,9 @@
 
 namespace Kitzberger\SysfileFaker;
 
+use GuzzleHttp\Exception\RequestException;
+use TYPO3\CMS\Core\Http\RequestFactory;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Core\Environment;
 
@@ -172,7 +175,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
         $white = imagecolorallocate($image, 255, 255, 255);
 
         // Draw a white rectangle
-        imagefilledrectangle($image, 5, 5, $props['width']-5, $props['height']-5, $white);
+        imagefilledrectangle($image, 5, 5, $props['width'] - 5, $props['height'] - 5, $white);
 
         $font = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf';
         if (isset($GLOBALS['TYPO3_CONF_VARS']['SYS']['fal']['fakeFilesIfMissingFont'])) {
@@ -196,7 +199,7 @@ class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
             if ($bbox[3] > 0) {
                 $bbox['height'] = abs($bbox[7] - $bbox[1]) - 1;
             }
-            imagettftext($image, $fontSize, 0, ($props['width']/2)-($bbox['width']/2), ($props['height']/2)+($bbox['height']/2), 0, $font, $text);
+            imagettftext($image, $fontSize, 0, ($props['width'] / 2) - ($bbox['width'] / 2), ($props['height'] / 2) + ($bbox['height'] / 2), 0, $font, $text);
         } else {
             imagestring($image, 5, 50, 50, $text, $black);
         }

@@ -1,6 +1,6 @@
 <?php
 
-defined('TYPO3_MODE') || exit('Access denied.');
+(defined('TYPO3_MODE') || defined('TYPO3')) || exit('Access denied.');
 
 if (isset($GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['sysfile_faker'])) {
     // TYPO3 10
@@ -26,7 +26,7 @@ if (!empty($configuration) && is_array($configuration)) {
         ];
     }
 
-    $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Resource\\FileReference'] = [
-        'className' => 'Kitzberger\\SysfileFaker\\FileReference'
-    ];
+  	$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][\TYPO3\CMS\Core\Resource\FileReference::class] = [
+		    'className' => \Kitzberger\SysfileFaker\FileReference::class
+	  ];
 }
