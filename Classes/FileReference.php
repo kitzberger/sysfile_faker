@@ -2,8 +2,8 @@
 
 namespace Kitzberger\SysfileFaker;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class FileReference extends \TYPO3\CMS\Core\Resource\FileReference
 {

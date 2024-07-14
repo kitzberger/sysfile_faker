@@ -7,30 +7,18 @@ $EM_CONF[$_EXTKEY] = [
     'shy' => 0,
     'version' => '1.7.0',
     'dependencies' => 'cms',
-    'conflicts' => '',
-    'priority' => '',
-    'loadOrder' => '',
-    'module' => '',
     'state' => 'stable',
-    'uploadfolder' => 0,
-    'createDirs' => '',
-    'modify_tables' => '',
     'clearcacheonload' => 1,
-    'lockType' => '',
     'author' => 'Philipp Kitzberger',
     'author_email' => 'typo3@kitze.net',
     'author_company' => '',
-    'CGLcompliance' => '',
-    'CGLcompliance_note' => '',
     'constraints' => [
         'depends' => [
-            'typo3' => '8.7.0-11.5.99',
+            'typo3' => '12.4.0-12.4.99',
         ],
         'conflicts' => [
         ],
         'suggests' => [
         ],
-    ],
-    'suggests' => [
     ],
 ];

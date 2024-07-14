@@ -8,7 +8,7 @@ Once installed and enabled this TYPO3 extension creates dummy image files (jpg, 
 Settings
 --------
 
-![sysfile\_faker Extension settings](settings.png "sysfile_faker Extension settings")
+![sysfile\_faker Extension settings](Resources/Public/Images/settings.png "sysfile_faker Extension settings")
 
 Checking the checkbox enables file faking for missing FAL files.
 
